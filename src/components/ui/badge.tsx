@@ -1,0 +1,1 @@
+export const Badge = ({ children, variant }: any) => <span className={`inline-block px-2 py-1 text-xs rounded ${variant === "success" ? "bg-green-600" : "bg-gray-700"}`}>{children}</span>;
