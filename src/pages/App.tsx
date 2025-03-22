@@ -1,15 +1,23 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Login from '../pages/Login';
-import DevPanel from '../components/DevPanel';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from './Login';
+import Register from './Register';
+import Dashboard from './Dashboard';
+import ProtectedRoute from '../components/ProtectedRoute';
 
-const App = () => {
+export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/dashboard" element={<DevPanel />} />
+      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
-};
-
-export default App;
+}
