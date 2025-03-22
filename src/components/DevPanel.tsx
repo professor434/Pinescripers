@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
-import { Label } from "./ui/label";
+import { Card, CardContent } from "./ui/card.tsx";
+import { Badge } from "./ui/badge.tsx";
+import { Button } from "./ui/button.tsx";
+import { ScrollArea } from "./ui/scroll-area.tsx";
+import { Label } from "./ui/label.tsx";
 
 const dummyIdeas = [
   {
