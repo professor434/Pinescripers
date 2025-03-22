@@ -1,6 +1,5 @@
 import React from 'react';
-import DevPanel from '../components/DevPanel'; // αν υπάρχει αυτό
-// import άλλα components εάν χρειάζονται
+import DevPanel from '../components/DevPanel';
 
 const App = () => {
   return (
