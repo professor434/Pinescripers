@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Card, CardContent } from "../ui/card";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { ScrollArea } from "../ui/scroll-area";
-import { Label } from "../ui/label";
-
+import { Card, CardContent } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+import { Label } from "./ui/label";
 
 const dummyIdeas = [
   {
@@ -30,7 +29,7 @@ const dummyIdeas = [
 export default function DevPanel() {
   const [ideas, setIdeas] = useState(dummyIdeas);
 
-  const handleStatus = (id, newStatus) => {
+  const handleStatus = (id: number, newStatus: string) => {
     setIdeas(ideas.map(idea => idea.id === id ? { ...idea, status: newStatus } : idea));
   };
 
@@ -46,11 +45,15 @@ export default function DevPanel() {
                   <h2 className="font-semibold text-lg">{idea.name}</h2>
                   <p className="text-sm text-muted-foreground">{idea.email}</p>
                 </div>
-                <Badge variant={idea.paid ? "success" : "outline"}>{idea.paid ? "Paid Request" : "Free Request"}</Badge>
+                <Badge variant={idea.paid ? "success" : "outline"}>
+                  {idea.paid ? "Paid Request" : "Free Request"}
+                </Badge>
               </div>
               <Label className="text-sm">Description</Label>
               <p>{idea.description}</p>
-              <p className="text-sm mt-2">📎 File: <span className="underline text-blue-600">{idea.file}</span></p>
+              <p className="text-sm mt-2">
+                📎 File: <span className="underline text-blue-600">{idea.file}</span>
+              </p>
               <div className="flex gap-2 pt-2">
                 <Button onClick={() => handleStatus(idea.id, "accepted")} variant="success">Accept</Button>
                 <Button onClick={() => handleStatus(idea.id, "rejected")} variant="destructive">Reject</Button>
