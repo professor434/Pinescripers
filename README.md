@@ -1,49 +1,60 @@
-# 🧠 PINESCRIPERS
+# 📊 Pinescripers
 
-Το **PINESCRIPERS** είναι μια πλατφόρμα που επιτρέπει σε χρήστες να μετατρέπουν στρατηγικές trading σε Pine Script indicators/strategies με απλό και διαδραστικό τρόπο. Υποστηρίζει τόσο απλούς χρήστες όσο και developers, με ενσωμάτωση στο Supabase και δυναμικό περιβάλλον frontend μέσω Vite + React + TypeScript.
-
-## 🚀 Live Deployment
-
-👉 [Δες το live στο Vercel](https://pinescripers.vercel.app)
-
-![Vercel](https://vercel.com/button)
-
-## 📁 Τεχνολογίες
-
-- ⚛️ React
-- ⛓️ Supabase (PostgreSQL + Auth)
-- 💨 Vite
-- 🔷 TypeScript
-- 🧠 Pine Script IDE Simulation
-- 🌐 Vercel Hosting
-
-## 📦 Εγκατάσταση
-
-```bash
-npm install
-npm run dev
-```
-
-## 📄 Περιεχόμενα
-
-- `src/components`: Κύρια components (UI και pages)
-- `src/pages`: Entry point (App.tsx)
-- `supabase`: Χρήση RLS, profiles & ideas tables
-- `.env`: Περιέχει κλειδιά Supabase (όχι public στο repo)
-
-## 🛠️ Περιβάλλον Ανάπτυξης
-
-Για να δουλέψεις τοπικά:
-
-```bash
-npm install
-npm run dev
-```
-
-## 🧑‍💻 Συνεισφορά
-
-Θέλεις να προσθέσεις νέο feature ή να διορθώσεις κάτι; Fork και pull request!
+Το **Pinescripers** είναι μια ολοκληρωμένη web εφαρμογή που επιτρέπει σε κάθε trader, developer ή enthusiast να μετατρέπει την ιδέα του για στρατηγική σε Pine Script εργαλείο μέσω custom service, ενώ περιλαμβάνει και δωρεάν εργαλεία και marketplace.
 
 ---
 
-> Made with ❤️ by the [PINESCRIPERS Project](https://github.com/professor434/Pinescripers)
+## ✅ Λειτουργίες
+
+### 🔐 Authentication (Supabase)
+- Login / Register
+- Role-based redirect (Admin & User)
+- Protected routes
+
+### 👤 Ρόλοι χρηστών
+- **Admin**:
+  - Πρόσβαση στο Admin Panel
+  - Βλέπει εισερχόμενες ιδέες στρατηγικών
+  - Αποδοχή ή απόρριψη αιτημάτων
+- **User**:
+  - Πρόσβαση στο Dashboard
+  - Χρήση του δωρεάν εργαλείου (free builder)
+  - Δυνατότητα αποστολής ιδέας στρατηγικής
+  - Λήψη τιμής από την ομάδα Pinescripers
+
+### 🛍️ Marketplace (σε επόμενο στάδιο)
+- Αγορές / Πωλήσεις Indicators & Strategies
+- Προφίλ Χρηστών
+
+---
+
+## 🧱 Τεχνολογίες
+
+- [x] React + Vite
+- [x] TailwindCSS
+- [x] Supabase Auth
+- [x] TypeScript
+- [x] Role-based routing
+
+---
+
+## 🚀 Τοπική Εκτέλεση
+
+```bash
+npm install
+npm run dev
+```
+
+Άνοιξε στο browser: `http://localhost:5173`
+
+---
+
+## 🌐 Παραγωγή
+
+Live: [https://pinescripers.vercel.app](https://pinescripers.vercel.app)
+
+---
+
+## 🤝 Συμμετοχή
+
+Η ομάδα του Pinescripers είναι ανοιχτή σε ιδέες, συνεργασίες και προσθήκες στρατηγικών. Στείλε μας την ιδέα σου μέσα από την εφαρμογή!
