@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const [authorized, setAuthorized] = useState(false);
+export default function ProtectedRoute({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles: string[];
+}) {
   const [loading, setLoading] = useState(true);
+  const [allowed, setAllowed] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -12,28 +20,38 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       } = await supabase.auth.getUser();
 
       if (!user) {
-        setLoading(false);
+        navigate("/login");
         return;
       }
 
-      const { data, error } = await supabase
+      const { data: profile, error } = await supabase
         .from("profiles")
         .select("role")
         .eq("user_id", user.id)
         .single();
 
-      if (!error && data?.role === "admin") {
-        setAuthorized(true);
+      if (error || !profile) {
+        navigate("/login");
+        return;
       }
 
+      const role = profile.role;
+
+      if (!allowedRoles.includes(role)) {
+        if (role === "admin") navigate("/admin");
+        else navigate("/dashboard");
+        return;
+      }
+
+      setAllowed(true);
       setLoading(false);
     };
 
     checkAccess();
-  }, []);
+  }, [allowedRoles, navigate]);
 
-  if (loading) return <p className="text-center">Checking access...</p>;
-  if (!authorized) return <p className="text-center text-red-400">Access denied</p>;
+  if (loading) return <p className="text-center p-4">Checking access...</p>;
+  if (!allowed) return null;
 
   return <>{children}</>;
 }

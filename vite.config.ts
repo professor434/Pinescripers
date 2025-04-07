@@ -1,15 +1,12 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Login from '../pages/Login';
-import DevPanel from '../components/DevPanel';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
-const App = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/dashboard" element={<DevPanel />} />
-    </Routes>
-  );
-};
-
-export default App;
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+})

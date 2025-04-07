@@ -1,0 +1,1 @@
+// Main App entry with all merged features (QR, Cart, Upload, Approvals)

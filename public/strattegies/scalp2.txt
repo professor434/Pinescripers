@@ -1,0 +1,78 @@
+//@version=6
+strategy("BTC Scalping Strategy - Optimized Final", overlay=true)
+
+// 🔹 Επιλογή Liquidation Levels
+liqSource = input.source(high, "Liquidation Reference")
+liqLevel = request.security(syminfo.tickerid, "60", liqSource)
+
+// 🔹 Χρονικό πλαίσιο για τα Swing Points
+swingLength = input(10, "Swing Length")
+
+// 🔹 Υπολογισμός Swing High και Swing Low
+swingHigh = ta.highest(high, swingLength)
+swingLow = ta.lowest(low, swingLength)
+
+// 🔹 Fibonacci Golden Pocket
+fibLow = swingLow
+fibHigh = swingHigh
+goldenPocketLow = fibHigh - (fibHigh - fibLow) * 0.618
+goldenPocketHigh = fibHigh - (fibHigh - fibLow) * 0.65
+
+// 🔹 Fixed Volume Profile (POC, VAH, VAL)
+vp_window = input(100, "Volume Profile Window")
+poc = ta.sma(volume, vp_window)
+vah = ta.highest(high, vp_window)
+val = ta.lowest(low, vp_window)
+
+// 🔹 ATR για δυναμικό Stop Loss
+atrLength = input(14, "ATR Length")
+atrValue = ta.atr(atrLength)
+stopLossMultiplier = input(1.5, "Stop Loss Multiplier")
+stopLossLong = close - (atrValue * stopLossMultiplier)
+stopLossShort = close + (atrValue * stopLossMultiplier)
+
+// 🔹 Επιβεβαίωση μέσω VWAP & Money Flow
+vwap = request.security(syminfo.tickerid, "5", ta.vwap(close))
+moneyFlow = request.security(syminfo.tickerid, "5", ta.sma(hlc3 * volume, 14))
+
+// 🔹 Στρατηγική εισόδου
+longCondition = ta.crossover(close, goldenPocketLow) and close > vwap and moneyFlow > ta.sma(moneyFlow, 10)
+shortCondition = ta.crossunder(close, goldenPocketHigh) and close < vwap and moneyFlow < ta.sma(moneyFlow, 10)
+
+// 🔹 Take Profit Levels
+takeProfitMultiplier = input(2.5, "Take Profit Multiplier")
+takeProfitLong = close + (atrValue * takeProfitMultiplier)
+takeProfitShort = close - (atrValue * takeProfitMultiplier)
+
+// 🔹 Στρατηγική εισόδου & εξόδου με Risk Management
+if longCondition
+    strategy.entry("Long", strategy.long)
+    strategy.exit("TP Long", from_entry="Long", limit=takeProfitLong, stop=stopLossLong)
+
+if shortCondition
+    strategy.entry("Short", strategy.short)
+    strategy.exit("TP Short", from_entry="Short", limit=takeProfitShort, stop=stopLossShort)
+
+// 🔹 Εμφάνιση Fibonacci Golden Pocket στο Chart
+plot(nz(goldenPocketLow), title="Fib 0.618", color=color.green, linewidth=2, trackprice=true)
+plot(nz(goldenPocketHigh), title="Fib 0.65", color=color.blue, linewidth=2, trackprice=true)
+
+// 🔹 Εμφάνιση Fixed Volume Profile στο Chart
+plot(poc, title="Point of Control", color=color.red, linewidth=2, trackprice=true)
+plot(vah, title="Value Area High", color=color.blue, linewidth=2, trackprice=true)
+plot(val, title="Value Area Low", color=color.green, linewidth=2, trackprice=true)
+
+// 🔹 Debugging Logs
+log.info("\n=== DEBUG INFO ===" +
+         "\nClose price: {0}" +
+         "\nGolden Pocket Low: {1}" +
+         "\nGolden Pocket High: {2}" +
+         "\nPOC: {3}" +
+         "\nVAH: {4}" +
+         "\nVAL: {5}" +
+         "\nVWAP: {6}" +
+         "\nMoney Flow: {7}" +
+         "\nLong Condition: {8}" +
+         "\nShort Condition: {9}",
+         close, goldenPocketLow, goldenPocketHigh, poc, vah, val, vwap, moneyFlow, longCondition, shortCondition)
+

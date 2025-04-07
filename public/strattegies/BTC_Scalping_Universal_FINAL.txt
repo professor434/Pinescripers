@@ -1,0 +1,96 @@
+
+//@version=6
+strategy("Universal BTC Scalping Strategy - PINEREE", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_value=0.05)
+
+// === INPUTS === //
+useSessions       = input.bool(true,  "Use Trading Sessions")
+useCipherConfirm  = input.bool(true,  "Use Cipher V2 Confirmation")
+useMACDConfirm    = input.bool(false, "Use MACD Confirmation")
+showDebug         = input.bool(true,  "Show Debug Info")
+pocHoldTime       = input.int(5,      "POC Hold Time (Minutes)")
+vp_window         = input.int(200,    "Volume Profile Window")
+swingLength       = input.int(21,     "Swing Length")
+tpMultiplier      = input.float(1.5,  "TP Multiplier", step=0.1)
+slMultiplier      = input.float(1.0,  "SL Multiplier", step=0.1)
+liqSource         = input.source(hlc3, "Liquidation Reference (60min)")
+
+// === LIQUIDATION LEVEL === //
+liqLevel = request.security(syminfo.tickerid, "60", liqSource)
+
+// === FIBONACCI LEVELS === //
+swingHigh = ta.highest(high, swingLength)
+swingLow  = ta.lowest(low, swingLength)
+goldenPocketLow  = swingHigh - (swingHigh - swingLow) * 0.608
+goldenPocketHigh = swingHigh - (swingHigh - swingLow) * 0.65
+goldenWalletLow  = goldenPocketLow * 0.995
+goldenWalletHigh = goldenPocketHigh * 1.015
+
+// === VOLUME PROFILE === //
+poc = ta.sma(volume, vp_window)
+vah = ta.highest(high, vp_window)
+val = ta.lowest(low, vp_window)
+
+// === CIPHER TREND === //
+moneyFlow = ta.sma(hlc3 * volume, 14)
+cipherBull = moneyFlow > ta.sma(moneyFlow, 10)
+cipherBear = moneyFlow < ta.sma(moneyFlow, 10)
+
+// === MACD TREND === //
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+macdBull = macdLine > signalLine
+macdBear = macdLine < signalLine
+
+// === POC HOLD === //
+var float pocTimer = na
+pocAbove = close > poc ? nz(pocTimer) + 1 : 0
+pocBelow = close < poc ? nz(pocTimer) + 1 : 0
+pocConfirmedLong  = pocAbove >= pocHoldTime
+pocConfirmedShort = pocBelow >= pocHoldTime
+
+// === SESSION FILTER === //
+inSession = (hour >= 8 and hour < 22)
+allowSession = not useSessions or inSession
+
+// === CONDITIONS === //
+longTrigger  = ta.crossover(close, goldenPocketLow) and close > poc
+shortTrigger = ta.crossunder(close, goldenPocketHigh) and close < poc
+longAllowed  = (not useCipherConfirm or cipherBull) and (not useMACDConfirm or macdBull) and pocConfirmedLong and allowSession
+shortAllowed = (not useCipherConfirm or cipherBear) and (not useMACDConfirm or macdBear) and pocConfirmedShort and allowSession
+longCondition  = longTrigger and longAllowed
+shortCondition = shortTrigger and shortAllowed
+
+// === ENTRY / EXIT === //
+tpLong = close + (vah - close) * tpMultiplier
+tpShort = close - (close - val) * tpMultiplier
+slLong = close - (close - swingLow) * slMultiplier
+slShort = close + (swingHigh - close) * slMultiplier
+
+if (longCondition)
+    strategy.entry("Long", strategy.long)
+    strategy.exit("TP Long", from_entry="Long", limit=tpLong, stop=slLong)
+
+if (shortCondition)
+    strategy.entry("Short", strategy.short)
+    strategy.exit("TP Short", from_entry="Short", limit=tpShort, stop=slShort)
+
+// === PLOTS === //
+plot(poc,  "POC",  color=color.red, linewidth=2)
+plot(vah,  "VAH",  color=color.green, linewidth=2)
+plot(val,  "VAL",  color=color.blue, linewidth=2)
+plot(goldenPocketLow,  "Fib 0.608", color=color.green, linewidth=1)
+plot(goldenPocketHigh, "Fib 0.65",  color=color.blue, linewidth=1)
+plot(liqLevel, "Liquidation Level", color=color.orange, linewidth=1)
+
+bgcolor(close > goldenWalletLow and close < goldenWalletHigh ? color.new(color.yellow, 90) : na)
+
+// === DEBUG === //
+var label debugLabel = na
+if (showDebug and barstate.islast)
+    debugInfo = "Type: " + (longCondition ? "LONG" : shortCondition ? "SHORT" : "NONE") +
+        " | Entry: " + str.tostring(close) +
+        " | TP: " + str.tostring(longCondition ? tpLong : shortCondition ? tpShort : na) +
+        " | SL: " + str.tostring(longCondition ? slLong : shortCondition ? slShort : na) +
+        " | POC Time: " + str.tostring(pocHoldTime) +
+        " | Cipher: " + str.tostring(useCipherConfirm ? (longCondition ? cipherBull : cipherBear) : na)
+    label.delete(debugLabel)
+    debugLabel := label.new(bar_index, high, text=debugInfo, style=label.style_label_down, color=color.black, textcolor=color.white)

@@ -5,13 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 
 export default function StrategyBuilder() {
+  const navigate = useNavigate();
   const [strategyType, setStrategyType] = useState("strategy");
   const [useMACD, setUseMACD] = useState(true);
   const [useVWAP, setUseVWAP] = useState(false);
   const [useFib, setUseFib] = useState(true);
   const [useVolumeProfile, setUseVolumeProfile] = useState(true);
+  const [useBlockchain, setUseBlockchain] = useState(false);
   const [swingLength, setSwingLength] = useState(10);
   const [outputCode, setOutputCode] = useState("// Generated Pine Script will appear here...");
 
@@ -60,53 +63,75 @@ export default function StrategyBuilder() {
       code += `if close > open\n    strategy.entry("Long", strategy.long)\n`;
     }
 
+    if (useBlockchain) {
+      code += `\n// Blockchain Dynamic: This strategy could be used in a smart contract for on-chain signals.\n`;
+    }
+
     setOutputCode(code);
   };
 
   return (
-    <div className="p-6 grid gap-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold">PINEREE Strategy Builder</h1>
-      <Card>
-        <CardContent className="grid gap-4 p-4">
-          <div className="grid grid-cols-2 gap-4 items-center">
-            <Label>Strategy Type</Label>
-            <select
-              className="border p-2 rounded"
-              value={strategyType}
-              onChange={(e) => setStrategyType(e.target.value)}
-            >
-              <option value="strategy">Strategy</option>
-              <option value="indicator">Indicator</option>
-            </select>
-            <Label>Use MACD</Label>
-            <Switch checked={useMACD} onCheckedChange={setUseMACD} />
-            <Label>Use VWAP</Label>
-            <Switch checked={useVWAP} onCheckedChange={setUseVWAP} />
-            <Label>Use Fibonacci</Label>
-            <Switch checked={useFib} onCheckedChange={setUseFib} />
-            <Label>Use Volume Profile</Label>
-            <Switch checked={useVolumeProfile} onCheckedChange={setUseVolumeProfile} />
-            <Label>Swing Length</Label>
-            <Input
-              type="number"
-              value={swingLength}
-              onChange={(e) => setSwingLength(Number(e.target.value))}
+    <div
+      className="min-h-screen bg-cover bg-center flex flex-col items-center justify-center p-6"
+      style={{ backgroundImage: "url('/assets/login-bg.png')" }}
+    >
+      <div className="bg-white/90 rounded-2xl shadow-2xl w-full max-w-5xl p-8">
+        <h1 className="text-3xl font-bold text-center mb-6">PINEREE Strategy Builder</h1>
+
+        <Card className="mb-6">
+          <CardContent className="grid gap-4 p-4">
+            <div className="grid grid-cols-2 gap-4 items-center">
+              <Label>Strategy Type</Label>
+              <select
+                className="border p-2 rounded"
+                value={strategyType}
+                onChange={(e) => setStrategyType(e.target.value)}
+              >
+                <option value="strategy">Strategy</option>
+                <option value="indicator">Indicator</option>
+              </select>
+
+              <Label>Use MACD</Label>
+              <Switch checked={useMACD} onCheckedChange={setUseMACD} />
+              <Label>Use VWAP</Label>
+              <Switch checked={useVWAP} onCheckedChange={setUseVWAP} />
+              <Label>Use Fibonacci</Label>
+              <Switch checked={useFib} onCheckedChange={setUseFib} />
+              <Label>Use Volume Profile</Label>
+              <Switch checked={useVolumeProfile} onCheckedChange={setUseVolumeProfile} />
+              <Label>Blockchain Dynamic</Label>
+              <Switch checked={useBlockchain} onCheckedChange={setUseBlockchain} />
+              <Label>Swing Length</Label>
+              <Input
+                type="number"
+                value={swingLength}
+                onChange={(e) => setSwingLength(Number(e.target.value))}
+              />
+            </div>
+            <Button onClick={generateCode} className="bg-blue-600 hover:bg-blue-700 text-white">
+              Generate Code
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <Label className="font-semibold text-lg mb-2 block">Generated Pine Script</Label>
+            <Textarea
+              className="font-mono text-sm p-4 bg-gray-100 rounded-md w-full h-[400px] resize-none"
+              value={outputCode}
+              readOnly
             />
-          </div>
-          <Button onClick={generateCode}>Generate Code</Button>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="p-4">
-          <Label>Generated Pine Script</Label>
-          <Textarea
-            className="font-mono text-sm mt-2"
-            rows={16}
-            value={outputCode}
-            readOnly
-          />
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        <Button
+          onClick={() => navigate("/dashboard")}
+          className="mt-6 bg-gray-800 text-white hover:bg-gray-900"
+        >
+          ← Back to Dashboard
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,73 @@
+//@version=6
+strategy("BTC Scalping Strategy - Debug Version", overlay=true)
+
+// 🔹 Απενεργοποίηση φίλτρου συνεδριών για να εκτελείται πάντα
+allowedSession = true  // Απενεργοποιούμε το session filtering
+
+// 🔹 Επιλογή Liquidation Levels
+liqSource = input.source(high, "Liquidation Reference")
+liqLevel = request.security(syminfo.tickerid, "60", liqSource)
+
+// 🔹 Χρονικό πλαίσιο για τα Swing Points
+swingLength = input(10, "Swing Length")
+
+// 🔹 Υπολογισμός Swing High και Swing Low
+swingHigh = ta.highest(high, swingLength)
+swingLow = ta.lowest(low, swingLength)
+
+// 🔹 Υπολογισμός Fibonacci Golden Pocket
+fibLow = swingLow
+fibHigh = swingHigh
+goldenPocketLow = fibHigh - (fibHigh - fibLow) * 0.618
+goldenPocketHigh = fibHigh - (fibHigh - fibLow) * 0.65
+
+// 🔹 Υπολογισμός Golden Wallet
+goldenWalletLow = goldenPocketLow * 0.995  
+goldenWalletHigh = goldenPocketHigh * 1.005  
+
+// 🔹 Fixed Volume Profile (POC, VAH, VAL)
+vp_window = input(100, "Volume Profile Window")
+poc = ta.sma(volume, vp_window)
+vah = ta.highest(high, vp_window)
+val = ta.lowest(low, vp_window)
+
+// 🔹 Χαλάρωση των φίλτρων Cyper V2 (μόνο Fibonacci signals)
+longCondition = ta.crossover(close, goldenPocketLow)  // Μόνο Fib 0.618 
+shortCondition = ta.crossunder(close, goldenPocketHigh)  // Μόνο Fib 0.65
+
+// 🔹 Stop Loss στο Swing Low/High
+stopLossLong = swingLow
+stopLossShort = swingHigh
+
+// 🔹 Στρατηγική Εισόδου & Εξόδου (χωρίς περιορισμούς sessions)
+if longCondition
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Exit Long", from_entry="Long", stop=stopLossLong)
+
+if shortCondition
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Exit Short", from_entry="Short", stop=stopLossShort)
+
+// 🔹 Εμφάνιση Fibonacci Golden Pocket στο Chart
+plot(nz(goldenPocketLow), title="Fib 0.618", color=color.green, linewidth=2, trackprice=true)
+plot(nz(goldenPocketHigh), title="Fib 0.65", color=color.blue, linewidth=2, trackprice=true)
+
+// 🔹 Εμφάνιση Golden Wallet ως ζώνη
+bgcolor(close > goldenWalletLow and close < goldenWalletHigh ? color.new(color.yellow, 90) : na)
+
+// 🔹 Εμφάνιση Fixed Volume Profile στο Chart
+plot(poc, title="Point of Control", color=color.red, linewidth=2, trackprice=true)
+plot(vah, title="Value Area High", color=color.blue, linewidth=2, trackprice=true)
+plot(val, title="Value Area Low", color=color.green, linewidth=2, trackprice=true)
+
+// 🔹 Debugging Logs για να δούμε αν υπάρχουν συνθήκες εισόδου
+log.info("\n=== DEBUG INFO ===" +
+         "\nClose price: {0}" +
+         "\nGolden Pocket Low: {1}" +
+         "\nGolden Pocket High: {2}" +
+         "\nPOC: {3}" +
+         "\nVAH: {4}" +
+         "\nVAL: {5}" +
+         "\nLong Condition: {6}" +
+         "\nShort Condition: {7}",
+         close, goldenPocketLow, goldenPocketHigh, poc, vah, val, longCondition, shortCondition)
