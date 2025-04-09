@@ -1,3 +1,4 @@
+import Grant from "@/pages/Grant";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Login";
@@ -44,7 +45,8 @@ const App = () => {
       <Route path="/admin-upload" element={<MarketplaceAdminUpload />} />
 	{/* Fallback route */}
       <Route path="*" element={<Navigate to="/login" />} />
-    </Routes>
+  <Route path="/grant" element={<Grant />} />  
+</Routes>
   );
 };
 

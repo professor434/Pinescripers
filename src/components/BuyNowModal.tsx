@@ -82,7 +82,7 @@ export default function BuyNowModal({
             {status === "pending" ? (
               <>
                 <img
-                  src="/assets/bep20-qr.png"
+                  src="/assets/bep20-qr.jpg"
                   alt="Scan QR"
                   className="w-48 h-48 object-contain rounded border border-gray-600"
                 />

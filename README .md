@@ -77,4 +77,4 @@ npm run dev
 
 ## 🪪 License
 
-MIT License © 2025 - Pinescripers Project
+MIT License © 2025 - Pinescripers Project C.H.
