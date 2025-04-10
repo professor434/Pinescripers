@@ -2,10 +2,10 @@
   "name": "pinescripers",
   "version": "1.0.0",
   "scripts": {
-  "build": "chmod +x node_modules/.bin/vite && vite build"
+  "build": "vite build",
+  "postinstall": "chmod +x ./node_modules/.bin/vite || true"
 }
-
-    "preview": "vite preview"
+ "preview": "vite preview"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.1",
