@@ -87,7 +87,7 @@ export default function CheckoutModal({ isOpen, onClose, userId }) {
         ) : (
           <div className="flex flex-col items-center space-y-3 bg-zinc-800 p-4 rounded border border-zinc-700">
             <img
-              src="public/assets/bep20-qr.jpg"
+              src="/bep20-qr.jpg"
               alt="Scan QR"
               className="w-44 h-44 rounded-sm border border-zinc-600 shadow"
             />
