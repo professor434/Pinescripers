@@ -82,10 +82,14 @@ export default function BuyNowModal({
             {status === "pending" ? (
               <>
                 <img
-                  src="https://pinescripers.vercel.app/assets/bep20-qr.jpg"
-                  alt="Scan QR"
-                  className="w-48 h-48 object-contain rounded border border-gray-600"
-                />
+  src="/assets/bep20-qr.jpg"
+  alt="Scan QR"
+  className="w-44 h-44 rounded-sm border border-zinc-600 shadow"
+/>
+<p className="text-xs text-center text-purple-400 mt-2">
+  BEP20 Wallet: <code className="text-xs">0x7528cf1984755a20a652e9e8a1e9a576efe2d960</code>
+</p>
+
                 <p className="text-sm text-gray-300 text-center">
                   📩 Please include your <strong>email</strong> or{" "}
                   <strong>User ID</strong> in the memo/tag.
