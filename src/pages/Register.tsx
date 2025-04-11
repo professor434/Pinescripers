@@ -12,20 +12,8 @@ export default function Register() {
     const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (!error && data.user) {
-      const { error: profileError } = await supabase.from("profiles").insert([
-        {
-          user_id: data.user.id,
-          role: "user",
-          email: data.user.email,
-        },
-      ]);
-
-      if (profileError) {
-        alert(`Profile insert error: ${profileError.message}`);
-      } else {
-        alert("Your account has been created! Please check your email inbox and verify your account to continue.");
-        navigate("/login");
-      }
+      alert("Your account has been created! Please check your email inbox and verify your account to continue.");
+      navigate("/login");
     } else if (error) {
       alert(error.message);
     }
